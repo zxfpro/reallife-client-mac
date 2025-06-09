@@ -1,6 +1,14 @@
 Metadata-Version: 2.4
 Name: reallife-client-mac
-Version: 0.1.1
+Version: 0.1.2
 Summary: Add your description here
 Requires-Python: >=3.13
 Description-Content-Type: text/markdown
+Requires-Dist: appscriptz>=0.1.4
+Requires-Dist: apscheduler>=3.11.0
+Requires-Dist: kanbanz==0.2.3
+Requires-Dist: requests>=2.32.3
+Requires-Dist: streamlit>=1.45.1
+Requires-Dist: toml>=0.10.2
+
+python -m src.reallife_client_mac.main

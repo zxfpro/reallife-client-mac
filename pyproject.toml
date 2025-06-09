@@ -1,7 +1,7 @@
 [project]
 name = "reallife-client-mac"
-version = "0.1.1"
+version = "0.1.2"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [ "appscriptz>=0.1.4", "apscheduler>=3.11.0", "kanbanz==0.2.3", "requests>=2.32.3", "streamlit>=1.45.1", "toml>=0.10.2",]
