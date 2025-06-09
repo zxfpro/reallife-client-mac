@@ -2,5 +2,4 @@ appscriptz>=0.1.4
 apscheduler>=3.11.0
 kanbanz==0.2.3
 requests>=2.32.3
-streamlit>=1.45.1
 toml>=0.10.2
