@@ -10,8 +10,8 @@ from typing import List
 from fastapi import FastAPI
 
 
-# 定义 FastAPI 服务的基础 URL
-BASE_URL = "http://localhost:8020"  # 如果你的服务运行在不同的地址或端口，请修改这里
+# 定义 FastAPI 服务的基础 URL Server
+BASE_URL = "http://101.201.244.227:8020"  # 如果你的服务运行在不同的地址或端口，请修改这里
 
 
 def update_task(tasks:list):
