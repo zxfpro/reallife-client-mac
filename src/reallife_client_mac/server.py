@@ -1,34 +1,32 @@
 from appscriptz.scripts.applescript import Display, ShortCut
 from kanbanz.manager import KanBanManager
 from kanbanz.manager import Pool
-
 import requests
 import json
-
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
-
 from pydantic import BaseModel # 导入 BaseModel
 from typing import List
 from fastapi import FastAPI
 
 
-def update_task(tasks:list):
-    # 定义 FastAPI 服务的基础 URL
-    BASE_URL = "http://localhost:8020"  # 如果你的服务运行在不同的地址或端口，请修改这里
+# 定义 FastAPI 服务的基础 URL
+BASE_URL = "http://localhost:8020"  # 如果你的服务运行在不同的地址或端口，请修改这里
 
+
+def update_task(tasks:list):
     # 定义要发送的任务数据
     tasks_data = {
         "tasks": tasks
     }
 
     # 构建完整的 API URL
-    api_url = f"{BASE_URL}/update_tasks"
+    url = f"{BASE_URL}/update_tasks"
 
     try:
         # 发送 POST 请求
         response = requests.post(
-            api_url,
+            url,
             headers={"Content-Type": "application/json"}, # 指定请求体的内容类型为 JSON
             json=tasks_data # 将 Python 字典转换为 JSON 并作为请求体发送
         )
@@ -54,8 +52,6 @@ def receive_task():
     Returns:
         dict or None: 当前任务数据（如果请求成功），否则为 None。
     """
-    BASE_URL = "http://localhost:8020"  # 如果你的服务运行在不同的地址或端口，请修改这里
-
     url = f"{BASE_URL}/receive"
     try:
         response = requests.get(url)
@@ -72,7 +68,6 @@ def complete_task():
     Returns:
         dict or None: 完成任务的响应数据（如果请求成功），否则为 None。
     """
-    BASE_URL = "http://localhost:8020"  # 如果你的服务运行在不同的地址或端口，请修改这里
     url = f"{BASE_URL}/complete"
     try:
         response = requests.get(url)
@@ -81,8 +76,6 @@ def complete_task():
     except requests.exceptions.RequestException as e:
         print(f"请求 /complete 失败: {e}")
         return None
-
-
 
 def task_with_time(task_name:str,time:int=1):
     """计时任务
@@ -105,6 +98,10 @@ def failed_safe():
     '''
     ShortCut.run_shortcut(shortcut_name="Session停止计时")
 
+
+
+
+
 def deal_task(task:str):
     print('deal_task->',task)
     if task.startswith("A!"):
@@ -123,9 +120,6 @@ def deal_task(task:str):
         else:
             # practice
             pass
-
-class TaskListRequest(BaseModel):
-    tasks: List[str]
 
 
 
@@ -170,6 +164,11 @@ class ReallifeClient():
                 return f"task: {task} 已完成"
             return '没有任务可以结束'
 
+    def tips(self,task:str):
+        self.manager.add_tips(task)
+        return 'success'
+
+
 
 
 app = FastAPI()
@@ -187,11 +186,19 @@ async def receive():
     result = reallife.kanban()
     return {"message": result}
 
+class TaskRequest(BaseModel):
+    task: str
+
+@app.post("/tips")
+async def tips(task_request:TaskRequest):
+    task = task_request.task
+    reallife.tips(task)
+    return {"message": '以添加'}
+
 @app.get("/receive")
 async def query_the_current_task():
     result = reallife.query_the_current_task()
     return {"message": result}
-
 
 @app.get("/start")
 async def morning():
