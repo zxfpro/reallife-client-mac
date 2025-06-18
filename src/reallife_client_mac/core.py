@@ -1,0 +1,192 @@
+""" core """
+import threading
+import requests
+from appscriptz.scripts.applescript import Display, ShortCut
+from kanbanz.manager import KanBanManager
+from kanbanz.manager import Pool
+
+# 定义 FastAPI 服务的基础 URL Server
+BASE_URL = "http://101.201.244.227:8020"  # 如果你的服务运行在不同的地址或端口，请修改这里
+
+
+def task_with_time(task_name:str,time:int=1):
+    """计时任务
+
+    Args:
+        task_name (str): 任务名
+        time (int, optional): 费用. Defaults to 1.
+    """
+    ShortCut.run_shortcut(shortcut_name="Session计时",params=f"{task_name}${time}")
+    Display.display_dialog("计时结束", "需要结束计时任务吗?",buttons = '"结束"',button_cancel=False)
+
+def failed_safe():
+    '''
+    查询session状态
+    如果 当前session 状态是 session
+        放弃session
+    否则
+        pass
+    结束
+    '''
+    ShortCut.run_shortcut(shortcut_name="Session停止计时")
+
+
+class ReallifeClient():
+    """ 23 """
+    def __init__(self):
+        self.pathlibs = ["/工程系统级设计/项目级别/数字人生/DigitalLife/DigitalLife.canvas",
+                         "/工程系统级设计/项目级别/自动化工作/近期工作.canvas",
+                         ]
+        self.kanban_path = "/Users/zhaoxuefeng/GitHub/obsidian/工作/事件看板/事件看板.md"
+        self.manager = KanBanManager(self.kanban_path,self.pathlibs)
+
+    def kanban(self): # 自动推送
+        """ 2 """
+        print('kanbans')
+        self.manager.sync_ready()
+        self.manager.sync_order()
+        # 调整时间和顺序 dig
+        Display.display_dialog('调整','调整时间和顺序')
+        self.manager.sync_run()
+        tasks = self.manager.kanban.get_tasks_in(Pool.执行池)
+        self._update_task(['A!'+i for i in tasks])
+        return ''
+
+    def _update_task(self,tasks:list):
+        """ 2 """
+        # 定义要发送的任务数据
+        tasks_data = {
+            "tasks": tasks
+        }
+
+        # 构建完整的 API URL
+        url = f"{BASE_URL}/update_tasks"
+
+        try:
+            # 发送 POST 请求
+            response = requests.post(
+                url,
+                headers={"Content-Type": "application/json"}, # 指定请求体的内容类型为 JSON
+                json=tasks_data, # 将 Python 字典转换为 JSON 并作为请求体发送
+                timeout=10
+            )
+
+            # 检查响应状态码
+            if response.status_code == 200:
+                print("Request successful!")
+                # 解析并打印响应的 JSON 数据
+                print("Response data:")
+                print(response.json())
+            else:
+                print(f"Request failed with status code: {response.status_code}")
+                print("Response text:")
+                print(response.text)
+
+        except requests.exceptions.RequestException as e:
+            print(f"An error occurred during the request: {e}")
+
+    def _receive_task(self):
+        """
+        接收当前任务。
+
+        Returns:
+            dict or None: 当前任务数据（如果请求成功），否则为 None。
+        """
+        url = f"{BASE_URL}/receive"
+        try:
+            response = requests.get(url, timeout=10)
+            response.raise_for_status() # 如果请求失败（非2xx状态码），抛出异常
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            print(f"请求 /receive 失败: {e}")
+            return None
+
+
+
+
+    def _complete_task(self)->dict:
+        """
+        完成当前任务。
+
+        Returns:
+            dict or None: 完成任务的响应数据（如果请求成功），否则为 None。
+        """
+        url = f"{BASE_URL}/complete"
+        try:
+            response = requests.get(url,timeout=10)
+            response.raise_for_status() # 如果请求失败（非2xx状态码），抛出异常
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            print(f"请求 /complete 失败: {e}")
+            return {}
+
+    def _deal_task(self,task:str):
+        """ 2 """
+        if task.startswith("A!"):
+            task = task.replace('A!','')
+            #TOOD 持续太久会请求超时
+            if task: # work
+                def do_task():
+                    result = Display.display_dialog(
+                        "Task Start", f"请打开飞书会议, 标题为{task} 自我审视+ 反思 + 分析笔记", 
+                        buttons='"完成"',
+                        button_cancel=False)
+                    if result == '完成':
+                        task_with_time(task_name=task, time=60)
+                        failed_safe()
+                    else:
+                        # 线程中不能直接 return, 可以考虑设置某种状态或日志
+                        print("任务已取消")
+
+                t = threading.Thread(target=do_task)
+                t.start()
+
+
+            else:
+                # practice
+                pass
+
+
+    def query_the_current_task(self):
+        """ 2 """
+        task = self._receive_task().get("message")
+        return task
+
+    def start(self):
+        """ 2 """
+        task = self._receive_task().get("message")
+        if task:
+            if "待办" in task:
+                # print('todo',task)
+                self._deal_task(task)
+                self._complete_task() # 调试
+                return f"task: {task} 进行中"
+            return '没有任务可以开始或者任务正在进行中'
+
+    def close(self):
+        """ 2 """
+        task = self._receive_task().get("message")
+        if task:
+            if "进行中" in task:
+                # 从执行池移除 放到完成池
+                # 从canvas 中移除
+                self._complete_task()
+                return f"task: {task} 已完成"
+            return '没有任务可以结束'
+
+    def run(self):
+        """ 2 """
+        task = self._receive_task().get("message")
+        if task:
+            if "待办" in task:
+                self._deal_task(task)
+                result = self._complete_task()
+            elif "进行中" in task:
+                result = self._complete_task()
+            info = result.get('message')
+            return info
+
+    def tips(self,task:str):
+        """ 添加内容到管理中 """
+        self.manager.add_tips(task)
+        return 'success'

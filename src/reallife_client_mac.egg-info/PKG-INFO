@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: reallife-client-mac
-Version: 0.1.5
+Version: 0.1.6
 Summary: Add your description here
 Requires-Python: >=3.10
 Description-Content-Type: text/markdown
@@ -10,4 +10,8 @@ Requires-Dist: kanbanz==0.2.3
 Requires-Dist: requests>=2.32.3
 Requires-Dist: toml>=0.10.2
 
-python -m src.reallife_client_mac.main
+# 开始
+python -m src.reallife_client_mac.server
+
+# 测试环境
+python -m src.reallife_client_mac.server 8121
