@@ -4,6 +4,8 @@ import requests
 from appscriptz.scripts.applescript import Display, ShortCut
 from kanbanz.manager import KanBanManager
 from kanbanz.manager import Pool
+from canvaz import Canvas,Color
+from kanbanz.utils import controlKanban
 
 # 定义 FastAPI 服务的基础 URL Server
 BASE_URL = "http://101.201.244.227:8020"  # 如果你的服务运行在不同的地址或端口，请修改这里
@@ -35,7 +37,7 @@ class ReallifeClient():
     """ 23 """
     def __init__(self):
         self.pathlibs = ["/工程系统级设计/项目级别/数字人生/DigitalLife/DigitalLife.canvas",
-                         "/工程系统级设计/项目级别/自动化工作/近期工作.canvas",
+                         "/工程系统级设计/项目级别/近期工作/近期工作.canvas",
                          "/工程系统级设计/能力级别/reallife-client-mac/reallife-client-mac.canvas",
                          "/工程系统级设计/能力级别/reallife/reallife.canvas",
                          "/工程系统级设计/能力级别/kanbanz/kanbanz.canvas",
@@ -46,7 +48,7 @@ class ReallifeClient():
                          ]
         self.pathlibs_dict = {
                         "DigitalLife":"/Users/zhaoxuefeng/GitHub/obsidian/工作/工程系统级设计/项目级别/数字人生/DigitalLife/DigitalLife.canvas",
-                        "近期工作":"/Users/zhaoxuefeng/GitHub/obsidian/工作/工程系统级设计/项目级别/自动化工作/近期工作.canvas",
+                        "近期工作":"/Users/zhaoxuefeng/GitHub/obsidian/工作/工程系统级设计/项目级别/近期工作/近期工作.canvas",
                         "reallife-client-mac":"/Users/zhaoxuefeng/GitHub/obsidian/工作/工程系统级设计/能力级别/reallife-client-mac/reallife-client-mac.canvas",
                         "reallife":"/Users/zhaoxuefeng/GitHub/obsidian/工作/工程系统级设计/能力级别/reallife/reallife.canvas",
                         "kanbanz":"/Users/zhaoxuefeng/GitHub/obsidian/工作/工程系统级设计/能力级别/kanbanz/kanbanz.canvas",
@@ -69,6 +71,25 @@ class ReallifeClient():
         tasks = self.manager.kanban.get_tasks_in(Pool.执行池)
         self._update_task(['A!'+i for i in tasks])
         return ''
+    
+    def build_flexible(self,task:str = None,
+                       type:str = 'flex',action = True)->str:
+        if type == 'pool':
+            tasks = self.manager.kanban.get_tasks_in(pool=Pool.酱油池)
+        elif type == 'flex':
+            tasks = [task]
+        else:
+            tasks = ['failed build']
+
+        if action:
+            tasks = ['A!'+i for i in tasks]
+
+
+        self._update_task(tasks)
+
+        return 'successed build'
+
+
 
     def _update_task(self,tasks:list):
         """ 2 """
@@ -140,21 +161,59 @@ class ReallifeClient():
 
     def _deal_task(self,task:str):
         """ 2 """
-        if task.startswith("A!"):
-            task = task.replace('A!','')
+
+        if task.startswith("A!") and task.endswith("(待办)"):
+            task = task.replace('A!','').replace("(待办)",'').strip()
             #TOOD 持续太久会请求超时
             if task: # work
+                times,task_info = task.split(' ',1)
+                assert times.endswith('P')
+                task_time = eval(times.replace('P','*20'))
                 def do_task():
                     result = Display.display_dialog(
-                        "Task Start", f"请打开飞书会议, 标题为{task} 自我审视+ 反思 + 分析笔记", 
+                        "Task Start", f"请打开飞书会议, 标题为{task_info} 自我审视+ 反思 + 分析笔记", 
                         buttons='"完成"',
                         button_cancel=False)
                     if result == '完成':
-                        task_with_time(task_name=task, time=60)
+                        task_with_time(task_name=task_info.replace('$','--'), time=task_time)
                         failed_safe()
+
+                        # TODO 移除任务
+                        try:
+                            with controlKanban(self.manager.kanban) as kb:
+                                kb.pop(task,pool=Pool.执行池)
+                                kb.insert(text=task,pool=Pool.完成池)
+                        except Exception as e:
+                            print('e',e)
+
+
+                        # TODO 在对应位置修改任务颜色
+                        repo,task_card = task_info.split('$',1)
+
+                        file_path = self.pathlibs_dict.get(repo,None)
+                        if not file_path:
+                            return 'failed pathlibs_dict.get None'
+
+                        canvas = Canvas(file_path=file_path)
+                        nodes = canvas.select_nodes_by_text(task_card)
+                        # 判断是否解决, 未完全解决设置为0 如果完全解决设置为4
+                        result_callback = Display.display_dialog(
+                            "Task End", f"标题为{task_info} 的任务是否彻底完成", 
+                            buttons='"是"',
+                            button_cancel=True)
+                        if result_callback =="是":
+                            color = "4"
+                        else:
+                            color = "0"
+                        nodes[0].color = color
+                        canvas.to_file(file_path)
+
+
                     else:
                         # 线程中不能直接 return, 可以考虑设置某种状态或日志
                         print("任务已取消")
+                    
+
 
                 t = threading.Thread(target=do_task)
                 t.start()
@@ -215,7 +274,6 @@ class ReallifeClient():
 
         # 合并并加入到指定的位置
         # tast_mock = "prefer:clientz:优化问题路线:具体的问题路线如下,1 设置工作空间"
-        from canvaz import Canvas,Color
         types,repo,quesion,detail = task.split(':',3)
         
         file_path = self.pathlibs_dict.get(repo,None)

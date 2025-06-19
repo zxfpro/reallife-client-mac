@@ -55,6 +55,26 @@ async def receive():
     result = reallife.kanban()
     return {"message": result}
 
+class BuildFlexibleConfigRequest(BaseModel):
+    """ 1 """
+    task: str = None
+    type: str = 'flex' # or pool
+    action: bool = True
+
+@app.post("/build_flexible")
+async def build_flexible(build_flexible_config: BuildFlexibleConfigRequest):
+    """_summary_
+
+    Args:
+        build_flexible_config (BuildFlexibleConfigRequest): _description_
+    """
+    result = reallife.build_flexible(
+        task=build_flexible_config.task,
+        type=build_flexible_config.type,
+        action=build_flexible_config.action
+    )
+    return {"message": result}
+
 @app.post("/tips")
 async def tips(task_request:TaskRequest):
     """_summary_
