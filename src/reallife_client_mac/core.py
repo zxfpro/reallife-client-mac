@@ -178,7 +178,7 @@ class ReallifeClient():
                         task_with_time(task_name=task_info.replace('$','--'), time=task_time)
                         failed_safe()
 
-                        # TODO 移除任务
+                        # 移除任务
                         try:
                             with controlKanban(self.manager.kanban) as kb:
                                 kb.pop(task,pool=Pool.执行池)
@@ -187,7 +187,7 @@ class ReallifeClient():
                             print('e',e)
 
 
-                        # TODO 在对应位置修改任务颜色
+                        # 在对应位置修改任务颜色
                         repo,task_card = task_info.split('$',1)
 
                         file_path = self.pathlibs_dict.get(repo,None)
