@@ -36,7 +36,25 @@ class ReallifeClient():
     def __init__(self):
         self.pathlibs = ["/工程系统级设计/项目级别/数字人生/DigitalLife/DigitalLife.canvas",
                          "/工程系统级设计/项目级别/自动化工作/近期工作.canvas",
+                         "/工程系统级设计/能力级别/reallife-client-mac/reallife-client-mac.canvas",
+                         "/工程系统级设计/能力级别/reallife/reallife.canvas",
+                         "/工程系统级设计/能力级别/kanbanz/kanbanz.canvas",
+                         "/工程系统级设计/能力级别/clientz/clientz.canvas",
+                         "/工程系统级设计/能力级别/commender/commender.canvas",
+                         "/工程系统级设计/能力级别/llmada/llmada.canvas",
+                         "/工程系统级设计/能力级别/promptlibz/promptlibz.canvas",
                          ]
+        self.pathlibs_dict = {
+                        "DigitalLife":"/Users/zhaoxuefeng/GitHub/obsidian/工作/工程系统级设计/项目级别/数字人生/DigitalLife/DigitalLife.canvas",
+                        "近期工作":"/Users/zhaoxuefeng/GitHub/obsidian/工作/工程系统级设计/项目级别/自动化工作/近期工作.canvas",
+                        "reallife-client-mac":"/Users/zhaoxuefeng/GitHub/obsidian/工作/工程系统级设计/能力级别/reallife-client-mac/reallife-client-mac.canvas",
+                        "reallife":"/Users/zhaoxuefeng/GitHub/obsidian/工作/工程系统级设计/能力级别/reallife/reallife.canvas",
+                        "kanbanz":"/Users/zhaoxuefeng/GitHub/obsidian/工作/工程系统级设计/能力级别/kanbanz/kanbanz.canvas",
+                        "clientz":"/Users/zhaoxuefeng/GitHub/obsidian/工作/工程系统级设计/能力级别/clientz/clientz.canvas",
+                        "commender":"/Users/zhaoxuefeng/GitHub/obsidian/工作/工程系统级设计/能力级别/commender/commender.canvas",
+                        "llmada":"/Users/zhaoxuefeng/GitHub/obsidian/工作/工程系统级设计/能力级别/llmada/llmada.canvas",
+                        "promptlibz":"/Users/zhaoxuefeng/GitHub/obsidian/工作/工程系统级设计/能力级别/promptlibz/promptlibz.canvas",
+                    }
         self.kanban_path = "/Users/zhaoxuefeng/GitHub/obsidian/工作/事件看板/事件看板.md"
         self.manager = KanBanManager(self.kanban_path,self.pathlibs)
 
@@ -183,10 +201,36 @@ class ReallifeClient():
                 result = self._complete_task()
             elif "进行中" in task:
                 result = self._complete_task()
+            else:
+                result = {'message':'所有任务已完成'}
             info = result.get('message')
             return info
 
     def tips(self,task:str):
         """ 添加内容到管理中 """
-        self.manager.add_tips(task)
+        # 做交互窗口, 选择到对应的仓库 -> clientz
+        # 选择工作模式 -> prefer bug research 
+        # 提交问题和详细描述(可以填无,富文本-理想 ) 以问题为主要导向
+
+
+        # 合并并加入到指定的位置
+        # tast_mock = "prefer:clientz:优化问题路线:具体的问题路线如下,1 设置工作空间"
+        from canvaz import Canvas,Color
+        types,repo,quesion,detail = task.split(':',3)
+        
+        file_path = self.pathlibs_dict.get(repo,None)
+        if not file_path:
+            return 'failed pathlibs_dict.get None'
+
+        canvas = Canvas(file_path=file_path)
+        if types == 'bug':
+            color = "3"
+        elif types == 'prefer':
+            color = "2"
+        else:
+            color = "0"
+
+        canvas.add_node(types + ":" + quesion +'\n'+ detail,color=color)
+        canvas.to_file(file_path)
+        # self.manager.add_tips(task)
         return 'success'
