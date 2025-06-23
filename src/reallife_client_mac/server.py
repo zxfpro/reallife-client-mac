@@ -98,7 +98,11 @@ async def query_the_current_task():
     """
     result = reallife.query_the_current_task()
     # return {"message": result}
-    return {"message":result.split(' ',1)[1]}
+    messages = result.split(' ',1)
+    if len(messages) == 1:
+        return {"message": messages[0]}
+    else:
+        return {"message":messages[1]}
 
 
 @app.get("/start")
@@ -110,7 +114,11 @@ async def start():
     """
     result = reallife.start()
     # return {"message": result}
-    return {"message":result.split(' ',1)[1]}
+    messages = result.split(' ',1)
+    if len(messages) == 1:
+        return {"message": messages[0]}
+    else:
+        return {"message":messages[1]}
 
 @app.get("/close")
 async def close():

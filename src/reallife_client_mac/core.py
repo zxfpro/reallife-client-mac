@@ -65,10 +65,9 @@ class ReallifeClient():
 
     def kanban(self): # 自动推送
         """ 2 """
-        print('kanbans')
+        logger.info('kanban')
         self.manager.sync_ready()
         self.manager.sync_order()
-        # 调整时间和顺序 dig
         Display.display_dialog('调整','调整时间和顺序')
         self.manager.sync_run()
         tasks = self.manager.kanban.get_tasks_in(Pool.执行池)
@@ -77,6 +76,7 @@ class ReallifeClient():
     
     def build_flexible(self,task:str = None,
                        type:str = 'flex',action = True)->str:
+        logger.info('flexible')
         if type == 'pool':
             tasks = self.manager.kanban.get_tasks_in(pool=Pool.酱油池)
         elif type == 'flex':
@@ -97,6 +97,14 @@ class ReallifeClient():
     def _update_task(self,tasks:list):
         """ 2 """
         # 定义要发送的任务数据
+        
+        for task in tasks:
+            assert " " in task
+            assert ":" in task
+            part1, part2 = task.split(' ',1)
+            assert ":" in part2
+
+
         tasks_data = {
             "tasks": tasks
         }
@@ -164,75 +172,74 @@ class ReallifeClient():
 
     def _deal_task(self,task:str):
         """ 处理动作类任务 """
+
         logger.info(" _deal_task 处理动作类任务 ")
+        logger.debug(f" task : {task}")
+        
+        assert '$' in task
         if task.startswith("A!") and task.endswith("(待办)"):
             task = task.replace('A!','').replace("(待办)",'').strip()
-            #TOOD 持续太久会请求超时
-            if task: # work
-                times,task_info = task.split(' ',1)
-                assert times.endswith('P')
-                task_time = eval(times.replace('P','*20'))
-                def do_task():
-                    logger.debug(f'#tip task_info :{task_info}')
+            # : 2P 近期工作$debug:测试1title
+            
+            times,task_info = task.split(' ',1)
+            # : 2P, 近期工作$debug:测试1title
+            # task_info : 近期工作$debug:测试1title
+            assert times.endswith('P')
+            task_time = eval(times.replace('P','*20'))
+            task_show = task_info.replace('$','-')
 
-                    result = Display.display_dialog(
-                        "Task Start", f"请打开飞书会议, 标题为{task_info.replace('$','--')} 自我审视+ 反思 + 分析笔记", 
-                        buttons='"完成"',
-                        button_cancel=False)
-                    if result == '完成':
-                        task_with_time(task_name=task_info.split(":")[-1], time=task_time)
-                        failed_safe()
+            def do_task():
+                result = Display.display_dialog(
+                    "Task Start", f"请打开飞书会议, 标题为{task_show} 自我审视+ 反思 + 分析笔记", 
+                    buttons='"完成"',
+                    button_cancel=False)
+                if result == '完成':
+                    task_with_time(task_name=task_show.split(":")[-1], time=task_time)
+                    failed_safe()
 
-                        # 移除任务
-                        try:
-                            with controlKanban(self.manager.kanban) as kb:
-                                kb.pop(task,pool=Pool.执行池)
-                                kb.insert(text=task,pool=Pool.完成池)
-                        except Exception as e:
-                            print('e',e)
-
-                        # 在对应位置修改任务颜色
-                        repo,task_card = task_info.split('$',1)
-
-                        file_path = self.pathlibs_dict.get(repo,None)
-                        if not file_path:
-                            return 'failed pathlibs_dict.get None'
-
-                        canvas = Canvas(file_path=file_path)
-                        nodes = canvas.select_nodes_by_text(task_card)
-                        # 判断是否解决, 未完全解决设置为0 如果完全解决设置为4
-                        result_callback = Display.display_dialog(
-                            "Task End", f"标题为{task_info.replace('$','--')} 的任务是否彻底完成", 
-                            buttons='"是"',
-                            button_cancel=True)
-                        if result_callback =="是":
-                            color = "4"
-                        else:
-                            color = "0"
-                        nodes[0].color = color
-                        canvas.to_file(file_path)
+                    # 移除任务
+                    try:
+                        with controlKanban(self.manager.kanban) as kb:
+                            kb.pop(task,pool=Pool.执行池)
+                            kb.insert(text=task,pool=Pool.完成池)
+                    except Exception as e:
+                        print('e',e)
 
 
+                    # 在对应位置修改任务颜色
+                    # repo,task_card = task_info.replace('$','-').split('-',1)
+                    repo,task_card = task_info.split('$',1)
+
+                    file_path = self.pathlibs_dict.get(repo,None)
+                    if not file_path:
+                        return 'failed pathlibs_dict.get None'
+                    canvas = Canvas(file_path=file_path)
+                    nodes = canvas.select_nodes_by_text(task_card)
+                    # 判断是否解决, 未完全解决设置为0 如果完全解决设置为4
+                    result_callback = Display.display_dialog(
+                        "Task End", f"标题为{task_show} 的任务是否彻底完成", 
+                        buttons='"是"',
+                        button_cancel=True)
+                    if result_callback =="是":
+                        color = "4"
                     else:
-                        # 线程中不能直接 return, 可以考虑设置某种状态或日志
-                        print("任务已取消")
-                    
+                        color = "0"
+                    nodes[0].color = color
+                    canvas.to_file(file_path)
 
 
-                t = threading.Thread(target=do_task)
-                t.start()
+                else:
+                    # 线程中不能直接 return, 可以考虑设置某种状态或日志
+                    print("任务已取消")
 
+            t = threading.Thread(target=do_task)
+            t.start()
 
-            else:
-                # practice
-                pass
 
 
     def query_the_current_task(self):
         """ 查询任务 """
         logger.info(" query_the_current_task ")
-        logger.debug('hello')
-        logger.info('workd')
         task = self._receive_task().get("message")
         return task
 
@@ -295,3 +302,10 @@ class ReallifeClient():
         canvas.to_file(file_path)
         # self.manager.add_tips(task)
         return 'success'
+
+"""
+执行池内容; 2P 近期工作-debug:测试1title
+_receive_task.get('message'): A!2P 近期工作-debug:测试1title (待办)
+
+
+"""
