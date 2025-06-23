@@ -1,5 +1,4 @@
 # 开始
-python -m reallife_client_mac.server
-
+uv run python -m reallife_client_mac.server --log-level "debug"
 # 测试环境
 python -m src.reallife_client_mac.server 8121 --log-level "info"
