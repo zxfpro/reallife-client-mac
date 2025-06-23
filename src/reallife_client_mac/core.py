@@ -175,6 +175,7 @@ class ReallifeClient():
                         buttons='"完成"',
                         button_cancel=False)
                     if result == '完成':
+                        print('task_info->',task_info)
                         task_with_time(task_name=task_info.replace('$','--'), time=task_time)
                         failed_safe()
 
@@ -186,7 +187,7 @@ class ReallifeClient():
                         except Exception as e:
                             print('e',e)
 
-
+                        print('task_info2->',task_info)
                         # 在对应位置修改任务颜色
                         repo,task_card = task_info.split('$',1)
 
