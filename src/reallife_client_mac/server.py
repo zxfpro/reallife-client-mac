@@ -97,7 +97,9 @@ async def query_the_current_task():
         _type_: _description_
     """
     result = reallife.query_the_current_task()
-    return {"message": result}
+    # return {"message": result}
+    return {"message":result.split(' ',1)[1]}
+
 
 @app.get("/start")
 async def start():
@@ -107,7 +109,8 @@ async def start():
         _type_: _description_
     """
     result = reallife.start()
-    return {"message": result}
+    # return {"message": result}
+    return {"message":result.split(' ',1)[1]}
 
 @app.get("/close")
 async def close():
@@ -128,7 +131,7 @@ async def run():
     """
     result = reallife.run()
     return {"message": result}
-
+    
 
 
 

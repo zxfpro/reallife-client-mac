@@ -180,7 +180,7 @@ class ReallifeClient():
                         buttons='"完成"',
                         button_cancel=False)
                     if result == '完成':
-                        task_with_time(task_name=task_info.replace('$','--'), time=task_time)
+                        task_with_time(task_name=task_info.split(":")[-1], time=task_time)
                         failed_safe()
 
                         # 移除任务
