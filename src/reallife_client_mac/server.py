@@ -131,9 +131,12 @@ async def run():
 
 
 
+
 if __name__ == "__main__":
     import argparse
     import uvicorn
+    from .log import Log
+
     parser = argparse.ArgumentParser(
         description="Start a simple HTTP server similar to http.server."
     )
@@ -141,18 +144,28 @@ if __name__ == "__main__":
         'port',
         metavar='PORT',
         type=int,
-        nargs='?', # 端口是可选的
+        nargs='?',  # 端口是可选的
         default=8021,
         help='Specify alternate port [default: 8000]'
     )
 
     parser.add_argument(
         '--is-server',
-        action='store_true', # 如果命令行中包含 --is-server，则将 args.is_server 设置为 True
+        action='store_true',  # 如果命令行中包含 --is-server，则将 args.is_server 设置为 True
         help='Set the server status for the receive function to True'
     )
 
+    parser.add_argument(
+        '--log-level',
+        type=str,
+        default='info',
+        choices=['debug', 'info', 'warning', 'error', 'critical'],
+        help='Set the logging level [default: info]'
+    )
+
     args = parser.parse_args()
+
+    Log.reset_level(args.log_level)
     app.state.is_server_status = args.is_server
 
     uvicorn.run(

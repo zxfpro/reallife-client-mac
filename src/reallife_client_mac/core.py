@@ -7,6 +7,9 @@ from kanbanz.manager import Pool
 from canvaz import Canvas,Color
 from kanbanz.utils import controlKanban
 import subprocess
+from .log import Log
+
+logger = Log.logger
 
 # 定义 FastAPI 服务的基础 URL Server
 BASE_URL = "http://101.201.244.227:8020"  # 如果你的服务运行在不同的地址或端口，请修改这里
@@ -160,8 +163,8 @@ class ReallifeClient():
             return {}
 
     def _deal_task(self,task:str):
-        """ 2 """
-
+        """ 处理动作类任务 """
+        logger.info(" _deal_task 处理动作类任务 ")
         if task.startswith("A!") and task.endswith("(待办)"):
             task = task.replace('A!','').replace("(待办)",'').strip()
             #TOOD 持续太久会请求超时
@@ -170,12 +173,13 @@ class ReallifeClient():
                 assert times.endswith('P')
                 task_time = eval(times.replace('P','*20'))
                 def do_task():
+                    logger.debug(f'#tip task_info :{task_info}')
+
                     result = Display.display_dialog(
-                        "Task Start", f"请打开飞书会议, 标题为{task_info} 自我审视+ 反思 + 分析笔记", 
+                        "Task Start", f"请打开飞书会议, 标题为{task_info.replace('$','--')} 自我审视+ 反思 + 分析笔记", 
                         buttons='"完成"',
                         button_cancel=False)
                     if result == '完成':
-                        print('task_info->',task_info)
                         task_with_time(task_name=task_info.replace('$','--'), time=task_time)
                         failed_safe()
 
@@ -187,7 +191,6 @@ class ReallifeClient():
                         except Exception as e:
                             print('e',e)
 
-                        print('task_info2->',task_info)
                         # 在对应位置修改任务颜色
                         repo,task_card = task_info.split('$',1)
 
@@ -199,7 +202,7 @@ class ReallifeClient():
                         nodes = canvas.select_nodes_by_text(task_card)
                         # 判断是否解决, 未完全解决设置为0 如果完全解决设置为4
                         result_callback = Display.display_dialog(
-                            "Task End", f"标题为{task_info} 的任务是否彻底完成", 
+                            "Task End", f"标题为{task_info.replace('$','--')} 的任务是否彻底完成", 
                             buttons='"是"',
                             button_cancel=True)
                         if result_callback =="是":
@@ -226,12 +229,16 @@ class ReallifeClient():
 
 
     def query_the_current_task(self):
-        """ 2 """
+        """ 查询任务 """
+        logger.info(" query_the_current_task ")
+        logger.debug('hello')
+        logger.info('workd')
         task = self._receive_task().get("message")
         return task
 
     def start(self):
-        """ 2 """
+        """ 执行任务 """
+        logger.info(" start 执行任务 ")
         task = self._receive_task().get("message")
         if task:
             if "待办" in task:
@@ -253,7 +260,8 @@ class ReallifeClient():
             return '没有任务可以结束'
 
     def run(self):
-        """ 2 """
+        """ 推进任务 """
+        logger.info(" run 推进任务 ")
         task = self._receive_task().get("message")
         if task:
             if "待办" in task:
@@ -268,7 +276,7 @@ class ReallifeClient():
 
     def tips(self,task:str):
         """ 添加内容到管理中 """
-
+        logger.info(" tips 添加内容 ")
         types,repo,quesion,detail = task.split(':',3)
 
         file_path = self.pathlibs_dict.get(repo,None)

@@ -15,7 +15,7 @@ class Logger:
             cls._instance = super().__new__(cls)
         return cls._instance
 
-    def __init__(self,value = None):
+    def __init__(self,level = 'debug'):
         """
         Level (级别): 定义日志的严重程度。从低到高依次是：
         DEBUG: 详细的调试信息，通常只在开发阶段使用。
@@ -29,10 +29,19 @@ class Logger:
         """
         if not hasattr(self, 'initialized'):
             self.initialized = True
-            self.value = value
 
-            # LOG_LEVEL = logging.DEBUG # 开发阶段
-            self.LOG_LEVEL = logging.INFO # 生产阶段
+            if level == 'debug':
+                self.LOG_LEVEL = logging.DEBUG  # 开发阶段
+            elif level == 'info':
+                self.LOG_LEVEL = logging.INFO  # 生产阶段
+            elif level == 'warning':
+                self.LOG_LEVEL = logging.WARNING
+            elif level == 'error':
+                self.LOG_LEVEL = logging.ERROR
+            elif level == 'critical':
+                self.LOG_LEVEL = logging.CRITICAL
+            else:
+                self.LOG_LEVEL = logging.INFO  # 默认级别
 
             # --- 2. 定义日志文件路径和名称 ---
             self.LOG_DIR = "logs"
@@ -43,6 +52,22 @@ class Logger:
             os.makedirs(self.LOG_DIR, exist_ok=True)
             self.logger = None
             self.setup_logging()
+
+    def reset_level(self,level = 'debug'):
+        if level == 'debug':
+            self.LOG_LEVEL = logging.DEBUG  # 开发阶段
+        elif level == 'info':
+            self.LOG_LEVEL = logging.INFO  # 生产阶段
+        elif level == 'warning':
+            self.LOG_LEVEL = logging.WARNING
+        elif level == 'error':
+            self.LOG_LEVEL = logging.ERROR
+        elif level == 'critical':
+            self.LOG_LEVEL = logging.CRITICAL
+        else:
+            self.LOG_LEVEL = logging.INFO  # 默认级别
+
+        self.setup_logging()
 
     def setup_logging(self):
         """# --- 3. 配置 Logger ---
@@ -101,6 +126,55 @@ class Logger:
 
 
 
-log = Logger
+Log = Logger()
 del Logger
 
+
+# from reallife_client_mac import log
+# 多线程也可以用
+
+# def test_log():
+#     logger = log().logger
+
+#     # logger = setup_logging()
+
+#     logger.debug("这是一个 DEBUG 级别的日志消息。")
+#     logger.info("程序启动成功，正在加载配置。")
+#     logger.warning("发现一个潜在问题：磁盘空间不足。")
+#     logger.error("处理用户请求时发生错误，用户ID: 123。")
+#     logger.critical("数据库连接失败，程序即将退出！")
+
+#     try:
+#         result = 10 / 0
+#     except Exception as e:
+#         logger.exception("除零错误发生！") # logger.exception() 会自动包含 traceback 信息
+
+#     logger.info("程序运行结束。")
+
+
+
+class _Servers:
+    """log
+
+    Returns:
+        _type_: single
+    """
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
+    def __init__(self,state = 'dev'):
+        """
+        
+        """
+        if not hasattr(self, 'initialized'):
+            self.initialized = True
+            self.state = state # dev test formal
+
+
+
+Servers = _Servers(state = 'dev')
+del Servers
