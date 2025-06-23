@@ -6,10 +6,10 @@ from kanbanz.manager import KanBanManager
 from kanbanz.manager import Pool
 from canvaz import Canvas,Color
 from kanbanz.utils import controlKanban
+import subprocess
 
 # 定义 FastAPI 服务的基础 URL Server
 BASE_URL = "http://101.201.244.227:8020"  # 如果你的服务运行在不同的地址或端口，请修改这里
-
 
 def task_with_time(task_name:str,time:int=1):
     """计时任务
@@ -267,15 +267,9 @@ class ReallifeClient():
 
     def tips(self,task:str):
         """ 添加内容到管理中 """
-        # 做交互窗口, 选择到对应的仓库 -> clientz
-        # 选择工作模式 -> prefer bug research 
-        # 提交问题和详细描述(可以填无,富文本-理想 ) 以问题为主要导向
 
-
-        # 合并并加入到指定的位置
-        # tast_mock = "prefer:clientz:优化问题路线:具体的问题路线如下,1 设置工作空间"
         types,repo,quesion,detail = task.split(':',3)
-        
+
         file_path = self.pathlibs_dict.get(repo,None)
         if not file_path:
             return 'failed pathlibs_dict.get None'
