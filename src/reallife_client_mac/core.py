@@ -223,7 +223,14 @@ class ReallifeClient():
                     if result_callback =="是":
                         color = "4"
                     else:
-                        color = "0"
+                        color_result = Display.display_dialog(
+                            "Task End2", f"是否将任务加入标记为黄色", 
+                            buttons='"是"',
+                            button_cancel=True)
+                        if color_result == "是":
+                            color = "3"
+                        else:
+                            color = "0"
                     nodes[0].color = color
                     canvas.to_file(file_path)
 
@@ -292,9 +299,11 @@ class ReallifeClient():
 
         canvas = Canvas(file_path=file_path)
         if types == 'bug':
-            color = "3"
+            color = "3" # 黄色
         elif types == 'prefer':
-            color = "2"
+            color = "2" # 橙色
+        elif types == 'research':
+            color = "6" # 紫色
         else:
             color = "0"
 
