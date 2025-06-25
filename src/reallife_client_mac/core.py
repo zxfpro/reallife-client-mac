@@ -67,9 +67,16 @@ class ReallifeClient():
         """ 2 """
         logger.info('kanban')
         self.manager.sync_ready()
-        self.manager.sync_order()
+        self.manager.sync_order(by='code')
         Display.display_dialog('调整','调整时间和顺序')
         self.manager.sync_run()
+        tasks = self.manager.kanban.get_tasks_in(Pool.执行池)
+        self._update_task(['A!'+i for i in tasks])
+        return ''
+    
+    def add_kanban(self,p = 6): # 手动追加
+        logger.info('add_kanban')
+        self.manager.sync_run(max_p = p)
         tasks = self.manager.kanban.get_tasks_in(Pool.执行池)
         self._update_task(['A!'+i for i in tasks])
         return ''

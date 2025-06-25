@@ -46,7 +46,7 @@ scheduler.add_job(reallife.kanban, CronTrigger(hour=9, minute=40, day_of_week='m
 
 
 @app.get("/build_kanban")
-async def receive():
+async def build_kanban():
     """_summary_
 
     Args:
@@ -55,11 +55,24 @@ async def receive():
     result = reallife.kanban()
     return {"message": result}
 
+@app.get("/add_kanban")
+async def add_kanban():
+    """_summary_
+
+    Args:
+        app (FastAPI): _description_
+    """
+    result = reallife.add_kanban(6)
+    return {"message": result}
+
+
 class BuildFlexibleConfigRequest(BaseModel):
     """ 1 """
     task: str = None
     type: str = 'flex' # or pool
     action: bool = True
+
+
 
 @app.post("/build_flexible")
 async def build_flexible(build_flexible_config: BuildFlexibleConfigRequest):
@@ -98,11 +111,14 @@ async def query_the_current_task():
     """
     result = reallife.query_the_current_task()
     # return {"message": result}
-    messages = result.split(' ',1)
-    if len(messages) == 1:
-        return {"message": messages[0]}
+    if result[1] == "!":
+        messages = result.split(' ',1)
+        if len(messages) == 1:
+            return {"message": messages[0]}
+        else:
+            return {"message":messages[1]}
     else:
-        return {"message":messages[1]}
+        return {"message": result}
 
 
 @app.get("/start")
@@ -114,11 +130,14 @@ async def start():
     """
     result = reallife.start()
     # return {"message": result}
-    messages = result.split(' ',1)
-    if len(messages) == 1:
-        return {"message": messages[0]}
+    if result[1] == "!":
+        messages = result.split(' ',1)
+        if len(messages) == 1:
+            return {"message": messages[0]}
+        else:
+            return {"message":messages[1]}
     else:
-        return {"message":messages[1]}
+        return {"message": result}
 
 @app.get("/close")
 async def close():
