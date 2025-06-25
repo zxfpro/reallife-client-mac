@@ -42,7 +42,7 @@ scheduler = BackgroundScheduler()
 
 reallife = ReallifeClient()
 
-scheduler.add_job(reallife.kanban, CronTrigger(hour=10, minute=3, day_of_week='mon-fri'))
+scheduler.add_job(reallife.kanban, CronTrigger(hour=9, minute=40, day_of_week='mon-fri'))
 
 
 @app.get("/build_kanban")
