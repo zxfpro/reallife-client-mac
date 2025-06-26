@@ -36,9 +36,13 @@ def failed_safe():
     ShortCut.run_shortcut(shortcut_name="Session停止计时")
 
 
+from pathlib import Path
+
+
 class ReallifeClient():
     """ 23 """
     def __init__(self):
+        home  = "/Users/zhaoxuefeng/GitHub/obsidian/工作"
         self.pathlibs = ["/工程系统级设计/项目级别/数字人生/DigitalLife/DigitalLife.canvas",
                          "/工程系统级设计/项目级别/近期工作/近期工作.canvas",
                          "/工程系统级设计/能力级别/reallife-client-mac/reallife-client-mac.canvas",
@@ -48,18 +52,9 @@ class ReallifeClient():
                          "/工程系统级设计/能力级别/commender/commender.canvas",
                          "/工程系统级设计/能力级别/llmada/llmada.canvas",
                          "/工程系统级设计/能力级别/promptlibz/promptlibz.canvas",
+                         "/工程系统级设计/能力级别/querypipz/querypipz.canvas",
                          ]
-        self.pathlibs_dict = {
-                        "DigitalLife":"/Users/zhaoxuefeng/GitHub/obsidian/工作/工程系统级设计/项目级别/数字人生/DigitalLife/DigitalLife.canvas",
-                        "近期工作":"/Users/zhaoxuefeng/GitHub/obsidian/工作/工程系统级设计/项目级别/近期工作/近期工作.canvas",
-                        "reallife-client-mac":"/Users/zhaoxuefeng/GitHub/obsidian/工作/工程系统级设计/能力级别/reallife-client-mac/reallife-client-mac.canvas",
-                        "reallife":"/Users/zhaoxuefeng/GitHub/obsidian/工作/工程系统级设计/能力级别/reallife/reallife.canvas",
-                        "kanbanz":"/Users/zhaoxuefeng/GitHub/obsidian/工作/工程系统级设计/能力级别/kanbanz/kanbanz.canvas",
-                        "clientz":"/Users/zhaoxuefeng/GitHub/obsidian/工作/工程系统级设计/能力级别/clientz/clientz.canvas",
-                        "commender":"/Users/zhaoxuefeng/GitHub/obsidian/工作/工程系统级设计/能力级别/commender/commender.canvas",
-                        "llmada":"/Users/zhaoxuefeng/GitHub/obsidian/工作/工程系统级设计/能力级别/llmada/llmada.canvas",
-                        "promptlibz":"/Users/zhaoxuefeng/GitHub/obsidian/工作/工程系统级设计/能力级别/promptlibz/promptlibz.canvas",
-                    }
+        self.pathlibs_dict = {Path(i).stem: home+i for i in self.pathlibs}
         self.kanban_path = "/Users/zhaoxuefeng/GitHub/obsidian/工作/事件看板/事件看板.md"
         self.manager = KanBanManager(self.kanban_path,self.pathlibs)
 
@@ -311,6 +306,8 @@ class ReallifeClient():
             color = "2" # 橙色
         elif types == 'research':
             color = "6" # 紫色
+        elif types == "complex":
+            color = "2" # 紫色
         else:
             color = "0"
 

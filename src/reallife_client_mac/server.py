@@ -180,27 +180,25 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        '--is-server',
-        action='store_true',  # 如果命令行中包含 --is-server，则将 args.is_server 设置为 True
-        help='Set the server status for the receive function to True'
-    )
-
-    parser.add_argument(
-        '--log-level',
+        '--env',
         type=str,
-        default='info',
-        choices=['debug', 'info', 'warning', 'error', 'critical'],
-        help='Set the logging level [default: info]'
+        default='dev', # 默认是开发环境
+        choices=['dev', 'prod'],
+        help='Set the environment (dev or prod) [default: dev]'
     )
 
     args = parser.parse_args()
 
-    Log.reset_level(args.log_level)
-    app.state.is_server_status = args.is_server
+    port = args.port
+    if args.env == "dev":
+        port += 100
+        Log.reset_level('debug',env = args.env)
+    elif args.env == "prod":
+        Log.reset_level('info',env = args.env)# ['debug', 'info', 'warning', 'error', 'critical']
 
     uvicorn.run(
         app,
         host="0.0.0.0",
-        port=args.port,
+        port=port,
         reload=False  # 启用热重载
     )
