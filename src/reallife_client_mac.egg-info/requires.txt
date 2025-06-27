@@ -1,4 +1,4 @@
-appscriptz>=0.1.4
+appscriptz>=0.1.6
 apscheduler>=3.11.0
 canvaz>=0.1.3
 kanbanz==0.2.7
