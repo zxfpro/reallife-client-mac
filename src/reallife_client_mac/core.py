@@ -178,8 +178,8 @@ class ReallifeClient():
         logger.info(" _deal_task 处理动作类任务 ")
         logger.debug(f" task : {task}")
         
-        assert '$' in task
         if task.startswith("A!") and task.endswith("(待办)"):
+            assert '$' in task
             task = task.replace('A!','').replace("(待办)",'').strip()
             # : 2P 近期工作$debug:测试1title
             
@@ -319,5 +319,4 @@ class ReallifeClient():
 """
 执行池内容; 2P 近期工作-debug:测试1title
 _receive_task.get('message'): A!2P 近期工作-debug:测试1title (待办)
-
 """
