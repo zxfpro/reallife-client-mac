@@ -2,17 +2,27 @@
 import threading
 import requests
 from appscriptz.scripts.applescript import Display, ShortCut
-from kanbanz.manager import KanBanManager
-from kanbanz.manager import Pool
-from canvaz import Canvas,Color
+from kanbanz.manager import KanBanManager, Pool
 from kanbanz.utils import controlKanban
-import subprocess
+from canvaz import Canvas,Color
 from .log import Log
 
 logger = Log.logger
 
 # 定义 FastAPI 服务的基础 URL Server
 BASE_URL = "http://101.201.244.227:8020"  # 如果你的服务运行在不同的地址或端口，请修改这里
+
+PATHLIBS = ["/工程系统级设计/项目级别/数字人生/DigitalLife/DigitalLife.canvas",
+            "/工程系统级设计/项目级别/近期工作/近期工作.canvas",
+            "/工程系统级设计/能力级别/reallife-client-mac/reallife-client-mac.canvas",
+            "/工程系统级设计/能力级别/reallife/reallife.canvas",
+            "/工程系统级设计/能力级别/kanbanz/kanbanz.canvas",
+            "/工程系统级设计/能力级别/clientz/clientz.canvas",
+            "/工程系统级设计/能力级别/commender/commender.canvas",
+            "/工程系统级设计/能力级别/llmada/llmada.canvas",
+            "/工程系统级设计/能力级别/promptlibz/promptlibz.canvas",
+            "/工程系统级设计/能力级别/querypipz/querypipz.canvas",
+            ]
 
 def task_with_time(task_name:str,time:int=1):
     """计时任务
@@ -40,27 +50,17 @@ from pathlib import Path
 
 
 class ReallifeClient():
-    """ 23 """
+    """ 任务管理工具 客户端 """
     def __init__(self):
         home  = "/Users/zhaoxuefeng/GitHub/obsidian/工作"
-        self.pathlibs = ["/工程系统级设计/项目级别/数字人生/DigitalLife/DigitalLife.canvas",
-                         "/工程系统级设计/项目级别/近期工作/近期工作.canvas",
-                         "/工程系统级设计/能力级别/reallife-client-mac/reallife-client-mac.canvas",
-                         "/工程系统级设计/能力级别/reallife/reallife.canvas",
-                         "/工程系统级设计/能力级别/kanbanz/kanbanz.canvas",
-                         "/工程系统级设计/能力级别/clientz/clientz.canvas",
-                         "/工程系统级设计/能力级别/commender/commender.canvas",
-                         "/工程系统级设计/能力级别/llmada/llmada.canvas",
-                         "/工程系统级设计/能力级别/promptlibz/promptlibz.canvas",
-                         "/工程系统级设计/能力级别/querypipz/querypipz.canvas",
-                         ]
+        self.pathlibs = PATHLIBS
         self.pathlibs_dict = {Path(i).stem: home+i for i in self.pathlibs}
-        self.kanban_path = "/Users/zhaoxuefeng/GitHub/obsidian/工作/事件看板/事件看板.md"
+        self.kanban_path = home + "/事件看板/事件看板.md"
         self.manager = KanBanManager(self.kanban_path,self.pathlibs)
 
     def kanban(self): # 自动推送
-        """ 2 """
-        logger.info('kanban')
+        """ 看板任务构建 """
+        logger.info('kanban build')
         self.manager.sync_ready()
         self.manager.sync_order(by='code')
         Display.display_dialog('调整','调整时间和顺序')
