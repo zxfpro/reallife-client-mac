@@ -1,0 +1,18 @@
+2025-06-28 22:03:49,149 - DEBUG - tzlocal - unix:120 - /etc/localtime found
+2025-06-28 22:03:49,150 - DEBUG - tzlocal - unix:136 - 1 found:
+ {'/etc/localtime is a symlink to': 'Asia/Shanghai'}
+2025-06-28 22:03:49,150 - INFO - apscheduler.scheduler - base:507 - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-06-28 22:03:50,036 - DEBUG - tzlocal - unix:120 - /etc/localtime found
+2025-06-28 22:03:50,038 - DEBUG - tzlocal - unix:136 - 1 found:
+ {'/etc/localtime is a symlink to': 'Asia/Shanghai'}
+2025-06-28 22:03:50,038 - INFO - apscheduler.scheduler - base:507 - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-06-28 22:03:50,048 - DEBUG - asyncio - selector_events:64 - Using selector: KqueueSelector
+2025-06-28 22:04:02,552 - DEBUG - tzlocal - unix:120 - /etc/localtime found
+2025-06-28 22:04:02,553 - DEBUG - tzlocal - unix:136 - 1 found:
+ {'/etc/localtime is a symlink to': 'Asia/Shanghai'}
+2025-06-28 22:04:02,554 - INFO - apscheduler.scheduler - base:507 - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-06-28 22:04:03,435 - DEBUG - tzlocal - unix:120 - /etc/localtime found
+2025-06-28 22:04:03,436 - DEBUG - tzlocal - unix:136 - 1 found:
+ {'/etc/localtime is a symlink to': 'Asia/Shanghai'}
+2025-06-28 22:04:03,437 - INFO - apscheduler.scheduler - base:507 - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-06-28 22:04:03,447 - DEBUG - asyncio - selector_events:64 - Using selector: KqueueSelector

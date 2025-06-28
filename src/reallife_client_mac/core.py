@@ -192,7 +192,7 @@ class ReallifeClient():
 
             def do_task():
                 result = Display.display_dialog(
-                    "Task Start", f"请打开飞书会议, 标题为{task_show} 自我审视+ 反思 + 分析笔记", 
+                    "Task Start", f"请打开飞书会议记录, 标题:\n {task_show}", 
                     buttons='"完成"',
                     button_cancel=False)
                 if result == '完成':
@@ -225,12 +225,26 @@ class ReallifeClient():
                     if result_callback =="是":
                         color = "4"
                     else:
+                        # 添加注释到canvas卡片中
+                        progress_notes = ShortCut.run_shortcut(shortcut_name = '进度备注')
+                        logger.info(f"progress_notes: {progress_notes}")
+                        assert isinstance(progress_notes,str)
+                        nodes[0].text = progress_notes
+
+
                         color_result = Display.display_dialog(
                             "Task End2", f"是否将任务加入标记为黄色", 
                             buttons='"是"',
                             button_cancel=True)
                         if color_result == "是":
                             color = "3"
+                            try:
+                                with controlKanban(self.manager.kanban) as kb:
+                                    kb.pop(task,pool=Pool.完成池)
+                                    kb.insert(text=task,pool=Pool.就绪池)
+                            except Exception as e:
+                                print('e',e)
+                            #
                         else:
                             color = "0"
                     nodes[0].color = color
@@ -239,7 +253,7 @@ class ReallifeClient():
 
                 else:
                     # 线程中不能直接 return, 可以考虑设置某种状态或日志
-                    print("任务已取消")
+                    logger.info("任务已取消")
 
             t = threading.Thread(target=do_task)
             t.start()

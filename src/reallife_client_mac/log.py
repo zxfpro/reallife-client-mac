@@ -126,6 +126,6 @@ class Logger:
         self.logger = logger
 
 
-Log = Logger(log_file_name = "reallife_client_mac.log")
+Log = Logger(log_file_name = "app.log")
 del Logger
 
