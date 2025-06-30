@@ -229,7 +229,7 @@ class ReallifeClient():
                         progress_notes = ShortCut.run_shortcut(shortcut_name = '进度备注')
                         logger.info(f"progress_notes: {progress_notes}")
                         assert isinstance(progress_notes,str)
-                        nodes[0].text = progress_notes
+                        nodes[0].text += f"补充: {progress_notes}"
 
 
                         color_result = Display.display_dialog(
