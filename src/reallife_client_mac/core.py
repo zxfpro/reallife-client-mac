@@ -12,8 +12,9 @@ logger = Log.logger
 # 定义 FastAPI 服务的基础 URL Server
 BASE_URL = "http://101.201.244.227:8020"  # 如果你的服务运行在不同的地址或端口，请修改这里
 
-PATHLIBS = ["/工程系统级设计/项目级别/数字人生/DigitalLife/DigitalLife.canvas",
+PATHLIBS = ["/工程系统级设计/项目级别/DigitalLife/DigitalLife.canvas",
             "/工程系统级设计/项目级别/近期工作/近期工作.canvas",
+            "/工程系统级设计/项目级别/coder/coder.canvas",
             "/工程系统级设计/能力级别/reallife-client-mac/reallife-client-mac.canvas",
             "/工程系统级设计/能力级别/reallife/reallife.canvas",
             "/工程系统级设计/能力级别/kanbanz/kanbanz.canvas",
@@ -22,6 +23,9 @@ PATHLIBS = ["/工程系统级设计/项目级别/数字人生/DigitalLife/Digita
             "/工程系统级设计/能力级别/llmada/llmada.canvas",
             "/工程系统级设计/能力级别/promptlibz/promptlibz.canvas",
             "/工程系统级设计/能力级别/querypipz/querypipz.canvas",
+            "/工程系统级设计/能力级别/person_bank_analyse/person_bank_analyse.canvas",
+            "/工程系统级设计/能力级别/agentwf/agentwf.canvas",
+            "/工程系统级设计/能力级别/toolsz/toolsz.canvas",
             ]
 
 def task_with_time(task_name:str,time:int=1):
@@ -174,89 +178,87 @@ class ReallifeClient():
 
     def _deal_task(self,task:str):
         """ 处理动作类任务 """
-
         logger.info(" _deal_task 处理动作类任务 ")
         logger.debug(f" task : {task}")
-        
-        if task.startswith("A!") and task.endswith("(待办)"):
+
+        try:
+            assert task.startswith("A!") and task.endswith("(待办)")
             assert '$' in task
-            task = task.replace('A!','').replace("(待办)",'').strip()
-            # : 2P 近期工作$debug:测试1title
-            
-            times,task_info = task.split(' ',1)
-            # : 2P, 近期工作$debug:测试1title
-            # task_info : 近期工作$debug:测试1title
-            assert times.endswith('P')
-            task_time = eval(times.replace('P','*20'))
+        except AssertionError as e:
+            return "普通任务"
+
+
+        task = task.replace('A!','').replace("(待办)",'').strip()        
+        task_duration,task_info = task.split(' ',1)
+        try:
+            assert task_duration.endswith('P')
+            task_time = eval(task_duration.replace('P','*20'))
             task_show = task_info.replace('$','-')
+            repo,task_card = task_info.split('$',1)
+            file_path = self.pathlibs_dict.get(repo,None)
+            assert file_path
+        except AssertionError as e:
+            task_time = 10
+            task_show = task_info
+            logger.error(f" task_duration 格式错误: {e}")
 
-            def do_task():
-                result = Display.display_dialog(
-                    "Task Start", f"请打开飞书会议记录, 标题:\n {task_show}", 
-                    buttons='"完成"',
-                    button_cancel=False)
-                if result == '完成':
-                    task_with_time(task_name=task_show.split(":")[-1], time=task_time)
-                    failed_safe()
+        def do_task():
+            result = Display.display_dialog(
+                "Task Start", f"请打开飞书会议记录, 标题:\n {task_show}", 
+                buttons='"完成"',
+                button_cancel=False)
+            if result == '完成':
+                task_with_time(task_name=task_show.split(":")[-1], time=task_time)
+                failed_safe()
 
-                    # 移除任务
-                    try:
-                        with controlKanban(self.manager.kanban) as kb:
-                            kb.pop(task,pool=Pool.执行池)
-                            kb.insert(text=task,pool=Pool.完成池)
-                    except Exception as e:
-                        print('e',e)
+                # 移除任务
+                try:
+                    with controlKanban(self.manager.kanban) as kb:
+                        kb.pop(task,pool=Pool.执行池)
+                        kb.insert(text=task,pool=Pool.完成池)
+                except Exception as e:
+                    print('e',e)
 
-
-                    # 在对应位置修改任务颜色
-                    # repo,task_card = task_info.replace('$','-').split('-',1)
-                    repo,task_card = task_info.split('$',1)
-
-                    file_path = self.pathlibs_dict.get(repo,None)
-                    if not file_path:
-                        return 'failed pathlibs_dict.get None'
-                    canvas = Canvas(file_path=file_path)
-                    nodes = canvas.select_nodes_by_text(task_card)
-                    # 判断是否解决, 未完全解决设置为0 如果完全解决设置为4
-                    result_callback = Display.display_dialog(
-                        "Task End", f"标题为{task_show} 的任务是否彻底完成", 
+                canvas = Canvas(file_path=file_path)
+                nodes = canvas.select_nodes_by_text(task_card)
+                # 判断是否解决, 未完全解决设置为0 如果完全解决设置为4
+                result_callback = Display.display_dialog(
+                    "Task End", f"标题为{task_show} 的任务是否彻底完成", 
+                    buttons='"是"',
+                    button_cancel=True)
+                progress_notes = ShortCut.run_shortcut(shortcut_name = '进度备注')
+                # 添加注释到canvas卡片中
+                logger.info(f"progress_notes: {progress_notes}")
+                assert isinstance(progress_notes,str)
+                nodes[0].text += f"补充: {progress_notes}"
+                if result_callback =="是":
+                    color = "4"
+                else:
+                    color_result = Display.display_dialog(
+                        "Task End2", f"是否将任务加入标记为黄色", 
                         buttons='"是"',
                         button_cancel=True)
-                    if result_callback =="是":
-                        color = "4"
+                    if color_result == "是":
+                        color = "3"
+                        try:
+                            with controlKanban(self.manager.kanban) as kb:
+                                kb.pop(task,pool=Pool.完成池)
+                                kb.insert(text=task,pool=Pool.就绪池)
+                        except Exception as e:
+                            print('e',e)
+                        #
                     else:
-                        # 添加注释到canvas卡片中
-                        progress_notes = ShortCut.run_shortcut(shortcut_name = '进度备注')
-                        logger.info(f"progress_notes: {progress_notes}")
-                        assert isinstance(progress_notes,str)
-                        nodes[0].text += f"补充: {progress_notes}"
+                        color = "0"
+                nodes[0].color = color
+                canvas.to_file(file_path)
 
 
-                        color_result = Display.display_dialog(
-                            "Task End2", f"是否将任务加入标记为黄色", 
-                            buttons='"是"',
-                            button_cancel=True)
-                        if color_result == "是":
-                            color = "3"
-                            try:
-                                with controlKanban(self.manager.kanban) as kb:
-                                    kb.pop(task,pool=Pool.完成池)
-                                    kb.insert(text=task,pool=Pool.就绪池)
-                            except Exception as e:
-                                print('e',e)
-                            #
-                        else:
-                            color = "0"
-                    nodes[0].color = color
-                    canvas.to_file(file_path)
+            else:
+                # 线程中不能直接 return, 可以考虑设置某种状态或日志
+                logger.info("任务已取消")
 
-
-                else:
-                    # 线程中不能直接 return, 可以考虑设置某种状态或日志
-                    logger.info("任务已取消")
-
-            t = threading.Thread(target=do_task)
-            t.start()
+        t = threading.Thread(target=do_task)
+        t.start()
 
 
 
@@ -314,14 +316,17 @@ class ReallifeClient():
             return 'failed pathlibs_dict.get None'
 
         canvas = Canvas(file_path=file_path)
-        if types == 'bug':
-            color = "3" # 黄色
+        # 3代表执行中 4代表执行完成, 5代表系统框架
+        if types == "delay":
+            color = "0" # 灰色 代表延迟执行
         elif types == 'prefer':
-            color = "2" # 橙色
-        elif types == 'research':
-            color = "6" # 紫色
+            color = "0" # 灰色 代表延迟执行 优化意见
+        elif types == 'bug':
+            color = "1" # 红色 代表紧急bug
         elif types == "complex":
-            color = "2" # 紫色
+            color = "2" # 橙色 代表复杂, 跨包或者长时间的攻关
+        elif types == 'research':
+            color = "6" # 紫色 代表超长时间的研究, 但像软梳
         else:
             color = "0"
 
