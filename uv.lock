@@ -152,7 +152,7 @@ wheels = [
 
 [[package]]
 name = "appscriptz"
-version = "1.0.2"
+version = "1.0.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "llama-index" },
@@ -161,9 +161,9 @@ dependencies = [
     { name = "pytest" },
     { name = "toml" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/99/40/116a6492b7dc755826f65459409620ccdfa9a03c6102410e5c1abe2649bb/appscriptz-1.0.2.tar.gz", hash = "sha256:466314c22d58fbcbecbe1524b4fcb143087a149c743d01cecf60da1765e4c813", size = 10240 }
+sdist = { url = "https://files.pythonhosted.org/packages/74/dd/4cfb675540b0c9e1d5e650028659c97f1c31e6ca524adb8c6d9d6998cd47/appscriptz-1.0.3.tar.gz", hash = "sha256:e543755eb3e9f4bff7e9048c6d7d5a45cee0ea14c4bc7b36cc71b7581c7fcfe2", size = 10225 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/2a/f4/22649cb7edf301216c316205f0e2ea480c0217c66d979cb2eda66694ca61/appscriptz-1.0.2-py3-none-any.whl", hash = "sha256:0dc7d405977968f753c0ec33fd84a2f4e59512cda615c7a8ae8ebad30313c051", size = 9037 },
+    { url = "https://files.pythonhosted.org/packages/5c/c5/eb51c7e7f1121224f1c560372ea4479dfad240d87265890052ec2a2971a9/appscriptz-1.0.3-py3-none-any.whl", hash = "sha256:afe09a73edd996421d65b55a72afcf07e8b1dfbed322533ec2cb05c933cafcf4", size = 9033 },
 ]
 
 [[package]]
@@ -980,7 +980,7 @@ wheels = [
 
 [[package]]
 name = "llama-index"
-version = "0.12.45"
+version = "0.12.46"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "llama-index-agent-openai" },
@@ -996,9 +996,9 @@ dependencies = [
     { name = "llama-index-readers-llama-parse" },
     { name = "nltk" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/11/63/d8eee099d130ee4903e9d8b0a7e76e24ad4d04e373f08127caecbed60513/llama_index-0.12.45.tar.gz", hash = "sha256:5473e104b26a6356513ac13555a2ae70f1820d04580c24627c16ac05f952fd74", size = 8088 }
+sdist = { url = "https://files.pythonhosted.org/packages/4f/39/66c144a88b16911046f1fa0041cbde684450b541497b00be9c809c81aecb/llama_index-0.12.46.tar.gz", hash = "sha256:c45756d76faf2c94de1476d2315601125fbe084f887b25c6abbcef71c860cb45", size = 8088 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/e4/e1/138e08ca0e15abbee04ab6e7fe63de2a280a5e89665f195ff36d35d472b1/llama_index-0.12.45-py3-none-any.whl", hash = "sha256:2bbad370c18be396d3d21cc8ca7ab99e0ca6d5a86b8d3a2dd3645a762dba398b", size = 7085 },
+    { url = "https://files.pythonhosted.org/packages/cb/14/10da4f87ea637065429001da08bf64bff1d3e28af84836c57c6e18ca075e/llama_index-0.12.46-py3-none-any.whl", hash = "sha256:cf9af4035489294335c1c5f1f40f6ea6fa7be191d2cdffa6351f96578ed57376", size = 7086 },
 ]
 
 [[package]]
@@ -2174,7 +2174,7 @@ wheels = [
 
 [[package]]
 name = "reallife-client-mac"
-version = "0.1.20"
+version = "0.1.21"
 source = { virtual = "." }
 dependencies = [
     { name = "appscriptz" },
@@ -2187,12 +2187,12 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "appscriptz", specifier = ">=0.1.6" },
+    { name = "appscriptz", specifier = "==1.0.3" },
     { name = "apscheduler", specifier = ">=3.11.0" },
     { name = "canvaz", specifier = "==1.0.1" },
     { name = "kanbanz", specifier = "==0.2.8" },
     { name = "requests", specifier = ">=2.32.3" },
-    { name = "toml", specifier = ">=0.10.2" },
+    { name = "toml", specifier = "==0.10.2" },
 ]
 
 [[package]]
