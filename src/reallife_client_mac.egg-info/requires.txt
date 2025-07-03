@@ -4,3 +4,4 @@ canvaz==1.0.1
 kanbanz==0.2.8
 requests>=2.32.3
 toml==0.10.2
+uvicorn==0.35.0

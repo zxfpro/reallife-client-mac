@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: reallife-client-mac
-Version: 0.1.22
+Version: 0.1.23
 Summary: Add your description here
 Requires-Python: >=3.10
 Description-Content-Type: text/markdown
@@ -10,6 +10,7 @@ Requires-Dist: canvaz==1.0.1
 Requires-Dist: kanbanz==0.2.8
 Requires-Dist: requests>=2.32.3
 Requires-Dist: toml==0.10.2
+Requires-Dist: uvicorn==0.35.0
 
 # 开始
 <!-- python -m reallife_client_mac.server --log-level "info" -->
