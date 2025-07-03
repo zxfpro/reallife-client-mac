@@ -1,10 +1,10 @@
 """ core """
 import threading
 import requests
-from appscriptz.scripts.applescript import Display, ShortCut
+from appscriptz.core import Display,ShortCut
 from kanbanz.manager import KanBanManager, Pool
 from kanbanz.utils import controlKanban
-from canvaz import Canvas,Color
+from canvaz.core import Canvas,Color
 from .log import Log
 
 logger = Log.logger

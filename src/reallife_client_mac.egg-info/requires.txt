@@ -1,6 +1,6 @@
 appscriptz>=0.1.6
 apscheduler>=3.11.0
-canvaz>=0.1.3
+canvaz==1.0.1
 kanbanz==0.2.8
 requests>=2.32.3
 toml>=0.10.2
