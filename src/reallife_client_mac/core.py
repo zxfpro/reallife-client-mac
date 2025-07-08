@@ -14,7 +14,7 @@ BASE_URL = "http://101.201.244.227:8020"  # 如果你的服务运行在不同的
 
 PATHLIBS = ["/工程系统级设计/项目级别/DigitalLife/DigitalLife.canvas",
             "/工程系统级设计/项目级别/近期工作/近期工作.canvas",
-            "/工程系统级设计/项目级别/coder/coder.canvas",
+            "/工程系统级设计/项目级别/ComD/coder/coder.canvas",
             "/工程系统级设计/能力级别/reallife-client-mac/reallife-client-mac.canvas",
             "/工程系统级设计/能力级别/reallife/reallife.canvas",
             "/工程系统级设计/能力级别/kanbanz/kanbanz.canvas",
@@ -314,21 +314,23 @@ class ReallifeClient():
         file_path = self.pathlibs_dict.get(repo,None)
         if not file_path:
             return 'failed pathlibs_dict.get None'
-
+        print(file_path,'file_pathfile_pathfile_path')
         canvas = Canvas(file_path=file_path)
         # 3代表执行中 4代表执行完成, 5代表系统框架
         if types == "delay":
-            color = "0" # 灰色 代表延迟执行
+            color = Color.gray  # 灰色 代表延迟执行
         elif types == 'prefer':
-            color = "0" # 灰色 代表延迟执行 优化意见
-        elif types == 'bug':
-            color = "1" # 红色 代表紧急bug
+            color = Color.gray # 灰色 代表延迟执行 优化意见
+        elif types == 'debug':
+            color = Color.red # 红色 代表紧急debug
         elif types == "complex":
-            color = "2" # 橙色 代表复杂, 跨包或者长时间的攻关
+            color = Color.origne # 橙色 代表复杂, 跨包或者长时间的攻关
         elif types == 'research':
-            color = "6" # 紫色 代表超长时间的研究, 但像软梳
+            color = Color.purpol # 紫色 代表超长时间的研究, 但像软梳
+
         else:
             color = "0"
+            color = Color.gray
 
         canvas.add_node(types + ":" + quesion +'\n'+ detail,color=color)
         canvas.to_file(file_path)
