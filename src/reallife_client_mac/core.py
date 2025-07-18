@@ -26,6 +26,7 @@ PATHLIBS = ["/工程系统级设计/项目级别/DigitalLife/DigitalLife.canvas"
             "/工程系统级设计/能力级别/person_bank_analyse/person_bank_analyse.canvas",
             "/工程系统级设计/能力级别/agentwf/agentwf.canvas",
             "/工程系统级设计/能力级别/toolsz/toolsz.canvas",
+            "/工程系统级设计/生活区域/life/life.canvas",
             ]
 
 def task_with_time(task_name:str,time:int=1):
